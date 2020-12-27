@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
-const CountrySchema = mongoose.Schema({
+const RegionSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
   },
-  code: {
+  country_id: {
     type: String,
     required: true,
   },
 });
 
-module.exports = mongoose.model('country', CountrySchema);
+module.exports = mongoose.model('region', RegionSchema);

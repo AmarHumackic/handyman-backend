@@ -2,62 +2,63 @@ const express = require('express');
 const router = express.Router();
 const City = require('../models/city');
 
-
-// svi gradovi
+// all cities
 router.get('/', async (req, res) => {
-    try{
-        const city = await City.find();
-        res.json(city);
-    }catch(err){
-        res.json({ message: err });
-    }
+  try {
+    const city = await City.find();
+    res.json(city);
+  } catch ({message}) {
+    res.json({error: message});
+  }
 });
 
-// određeni grad
-router.get('/:cityId', async (req, res) => {
-    try{
-        const city = await City.findById(req.params.cityId);
-    }catch(err){
-        res.json({ message: err });
-    }
+// get city by id
+router.get('/:city_id', async (req, res) => {
+  try {
+    const city = await City.findById(req.params.city_id);
+    res.json(city);
+  } catch ({message}) {
+    message.startsWith('Cast to')
+      ? res.status(404).json({error: 'City not found'})
+      : res.status(500).json({error: message});
+  }
 });
 
-// dodaj grad
+// add city
 router.post('/', async (req, res) => {
-    console.log('req', req)
-    const city = new City({
-        name: req.body.name,
-        region: req.body.region
-    });
-    try{
-        const savedCity = await city.save();
-        res.json(savedCity);
-    }catch(err){
-        res.json({ message: err });
-    }
-
+  const city = new City({
+    name: req.body.name,
+    region_id: req.body.region_id,
+  });
+  try {
+    const savedCity = await city.save();
+    res.json(savedCity);
+  } catch ({message}) {
+    res.json({error: message});
+  }
 });
 
-// uredi grad
-router.patch('/:cityId', async (req, res) => {
-    try{
-        const updatedCity = await City.updateOne(
-            { _id: req.params.cityId },
-            { $set: { name: req.body.name }}
-        );
-        res.json(updatedCity);
-    }catch(err){
-        res.json({ message: err });
-    }
+// update city
+router.patch('/:city_id', async (req, res) => {
+  try {
+    const updatedCity = await City.updateOne(
+      {_id: req.params.city_id},
+      {$set: {name: req.body.name}},
+    );
+    res.json(updatedCity);
+  } catch (err) {
+    res.json({message: err});
+  }
 });
 
-// pobriši grad
-router.delete('/:cityId', async (req, res) => {
-    try{
-        const removedCity = await City.remove({ _id: req.params.cityId});
-    }catch(err){
-        res.json({ message: err });
-    }
+// delete city
+router.delete('/:city_id', async (req, res) => {
+  try {
+    const removedCity = await City.remove({_id: req.params.city_id});
+    res.json(removedCity);
+  } catch ({message}) {
+    res.json({erro: message});
+  }
 });
 
 module.exports = router;

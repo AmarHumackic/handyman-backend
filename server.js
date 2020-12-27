@@ -1,4 +1,3 @@
-// const cool = require("cool-ascii-faces");
 const express = require('express');
 var cors = require('cors');
 const app = express();
@@ -10,22 +9,31 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Import routes
-const citiesRoute = require('./routes/cities');
 const countriesRoute = require('./routes/countries');
+const regionsRoute = require('./routes/regions');
+const citiesRoute = require('./routes/cities');
+const userTypesRoute = require('./routes/userTypes');
+const serviceCategoriesRoute = require('./routes/serviceCategories');
+const servicesRoute = require('./routes/services');
+
+// env variables
+const {MONGODB_URL, URL_PREFIX} = process.env;
 
 // Middlewares
-app.use('/cities', citiesRoute);
-app.use('/countries', countriesRoute);
+app.use(`${URL_PREFIX}/countries`, countriesRoute);
+app.use(`${URL_PREFIX}/regions`, regionsRoute);
+app.use(`${URL_PREFIX}/cities`, citiesRoute);
+app.use(`${URL_PREFIX}/usertypes`, userTypesRoute);
+app.use(`${URL_PREFIX}/servicecategories`, serviceCategoriesRoute);
+app.use(`${URL_PREFIX}/services`, servicesRoute);
 
-app.get('/', (req, res) => {
-  res.send('Elektronicko poslovanje (Grupa 7) - backend');
+app.get(`${URL_PREFIX}`, (req, res) => {
+  res.send('Elektronicko poslovanje (Grupa 7) - API');
 });
-
-// app.get("/cool", (req, res) => res.send(cool()));
 
 // Connest to DB
 mongoose.connect(
-  process.env.MONGODB_URL,
+  MONGODB_URL,
   {
     useUnifiedTopology: true,
     useNewUrlParser: true,
