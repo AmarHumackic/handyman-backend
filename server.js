@@ -27,8 +27,14 @@ app.use(`${URL_PREFIX}/usertypes`, userTypesRoute);
 app.use(`${URL_PREFIX}/servicecategories`, serviceCategoriesRoute);
 app.use(`${URL_PREFIX}/services`, servicesRoute);
 
+// app.use('/*', (req, res) => {
+//   res.redirect(`${URL_PREFIX}/`);
+// });
+
 app.get(`${URL_PREFIX}`, (req, res) => {
-  res.send('Elektronicko poslovanje (Grupa 7) - API');
+  // res.send('Elektronicko poslovanje (Grupa 7) - API');
+  // res.redirect(`${URL_PREFIX}/`);
+  res.sendFile(__dirname + '/index.html');
 });
 
 // Connest to DB
