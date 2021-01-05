@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const City = require('../models/city');
 // const verifyToken = require('./VerifyToken');
-var verifyToken = require(__dirname + '/VerifyToken');
+var VerifyToken = require(__dirname + '/VerifyToken');
 
 // all cities
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', VerifyToken, async (req, res) => {
   try {
     const city = await City.find();
     res.json(city);
