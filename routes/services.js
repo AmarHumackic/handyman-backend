@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Service = require('../models/service');
+const verifyToken = require('./verifyToken');
 
 // get all services
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const services = await Service.find();
     res.json(services);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // get service by id
-router.get('/:service_id', async (req, res) => {
+router.get('/:service_id', verifyToken, async (req, res) => {
   try {
     const service = await Service.findById(req.params.service_id);
     res.json(service);
@@ -25,7 +26,7 @@ router.get('/:service_id', async (req, res) => {
 });
 
 // add service
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const service = new Service({
     name: req.body.name,
     description: req.body.description,

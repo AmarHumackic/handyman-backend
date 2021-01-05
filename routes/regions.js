@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Region = require('../models/region');
+const verifyToken = require('./verifyToken');
 
 // get all regions
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const regions = await Region.find();
     res.json(regions);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // get region by id
-router.get('/:region_id', async (req, res) => {
+router.get('/:region_id', verifyToken, async (req, res) => {
   try {
     const region = await Region.findById(req.params.region_id);
     res.json(region);
@@ -25,7 +26,7 @@ router.get('/:region_id', async (req, res) => {
 });
 
 // add region
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const region = new Region({
     name: req.body.name,
     country_id: req.body.country_id,

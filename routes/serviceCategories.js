@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const ServiceCategories = require('../models/serviceCategories');
+const verifyToken = require('./verifyToken');
 
 // get all service categories
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const serviceCategories = await ServiceCategories.find();
     res.json(serviceCategories);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // get service category by id
-router.get('/:service_category_id', async (req, res) => {
+router.get('/:service_category_id', verifyToken, async (req, res) => {
   try {
     const serviceCategory = await ServiceCategories.findById(
       req.params.service_category_id,
@@ -27,7 +28,7 @@ router.get('/:service_category_id', async (req, res) => {
 });
 
 // add service category
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const serviceCategory = new ServiceCategories({
     name: req.body.name,
     description: req.body.description,

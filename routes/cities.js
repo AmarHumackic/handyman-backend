@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const City = require('../models/city');
 const verifyToken = require('./verifyToken');
-// var VerifyToken = require(__dirname + '/');
 
 // all cities
 router.get('/', verifyToken, async (req, res) => {
@@ -15,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // get city by id
-router.get('/:city_id', async (req, res) => {
+router.get('/:city_id', verifyToken, async (req, res) => {
   try {
     const city = await City.findById(req.params.city_id);
     res.json(city);
@@ -27,7 +26,7 @@ router.get('/:city_id', async (req, res) => {
 });
 
 // add city
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const city = new City({
     name: req.body.name,
     region_id: req.body.region_id,
@@ -41,7 +40,7 @@ router.post('/', async (req, res) => {
 });
 
 // update city
-router.patch('/:city_id', async (req, res) => {
+router.patch('/:city_id', verifyToken, async (req, res) => {
   try {
     const updatedCity = await City.updateOne(
       {_id: req.params.city_id},
@@ -54,7 +53,7 @@ router.patch('/:city_id', async (req, res) => {
 });
 
 // delete city
-router.delete('/:city_id', async (req, res) => {
+router.delete('/:city_id', verifyToken, async (req, res) => {
   try {
     const removedCity = await City.remove({_id: req.params.city_id});
     res.json(removedCity);

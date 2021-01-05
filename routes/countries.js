@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Country = require('../models/country');
+const verifyToken = require('./verifyToken');
 
 // get all countries
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const country = await Country.find();
     res.json(country);
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // get country by id
-router.get('/:country_id', async (req, res) => {
+router.get('/:country_id', verifyToken, async (req, res) => {
   try {
     const country = await Country.findById(req.params.country_id);
     res.json(country);
@@ -25,7 +26,7 @@ router.get('/:country_id', async (req, res) => {
 });
 
 // add country
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   const country = new Country({
     name: req.body.name,
     code: req.body.code,
@@ -41,7 +42,7 @@ router.post('/', async (req, res) => {
 });
 
 // update country
-router.patch('/:country_id', async (req, res) => {
+router.patch('/:country_id', verifyToken, async (req, res) => {
   try {
     const updatedCountry = await Country.updateOne(
       {_id: req.params.country_id},
@@ -54,7 +55,7 @@ router.patch('/:country_id', async (req, res) => {
 });
 
 // delete country
-router.delete('/:country_id', async (req, res) => {
+router.delete('/:country_id', verifyToken, async (req, res) => {
   try {
     const removedCountry = await Country.remove({_id: req.params.country_id});
     res.json(removedCountry);

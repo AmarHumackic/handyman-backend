@@ -5,9 +5,10 @@ const City = require('../models/city');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {SECRET} = process.env;
+const verifyToken = require('./verifyToken');
 
 // get all users
-router.get('/', async (req, res) => {
+router.get('/', verifyToken, async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // get user by id
-router.get('/getinfo', async (req, res) => {
+router.get('/getinfo', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.body.user_id);
     const city = await City.findById(user.city_id);
@@ -73,8 +74,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// add user
-router.put('/addtoken', async (req, res) => {
+// add FCM token
+router.put('/addtoken', verifyToken, async (req, res) => {
   const {user_id, fcm_token} = req.body;
   try {
     const user = await User.findById(user_id);
