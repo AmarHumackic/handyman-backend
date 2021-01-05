@@ -2,11 +2,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 const City = require('../models/city');
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {SECRET} = process.env;
-const verifyToken = require('./VerifyToken');
 
 // get all users
 router.get('/', async (req, res) => {
