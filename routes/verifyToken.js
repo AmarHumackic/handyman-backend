@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
 const {SECRET} = process.env;
 
-const VerifyToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
   var token = req.headers['x-access-token'];
   if (!token) return res.status(403).send({error: 'No token provided.'});
 
@@ -15,4 +15,4 @@ const VerifyToken = (req, res, next) => {
   });
 };
 
-module.exports = VerifyToken;
+module.exports = verifyToken;
