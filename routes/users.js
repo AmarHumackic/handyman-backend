@@ -4,7 +4,7 @@ const User = require('../models/user');
 const City = require('../models/city');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const {SECRET} = process.env;
+const {SECRET, REFRESH_SECRET} = process.env;
 const verifyToken = require('./verifyToken');
 
 // get all users
@@ -17,8 +17,8 @@ router.get('/', verifyToken, async (req, res) => {
   }
 });
 
-// get user by id
-router.get('/getinfo', verifyToken, async (req, res) => {
+// get logged user details
+router.get('/details', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.body.user_id);
     const city = await City.findById(user.city_id);
@@ -37,8 +37,8 @@ router.get('/getinfo', verifyToken, async (req, res) => {
   }
 });
 
-// add user
-router.post('/', async (req, res) => {
+// register user
+router.post('/register', async (req, res) => {
   const {
     first_name,
     last_name,
@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
   try {
     const savedUser = await user.save();
     // Create a token
-    const token = jwt.sign({id: user._id}, SECRET, {expiresIn: 86400});
+    const token = jwt.sign({id: user._id}, SECRET, {expiresIn: '7d'});
     res.json({
       message: 'Registration success.',
       user_id: savedUser._id,
@@ -75,7 +75,7 @@ router.post('/', async (req, res) => {
 });
 
 // add FCM token
-router.put('/addtoken', verifyToken, async (req, res) => {
+router.put('/add-fcm-token', verifyToken, async (req, res) => {
   const {user_id, fcm_token} = req.body;
   try {
     const user = await User.findById(user_id);
@@ -92,19 +92,24 @@ router.put('/addtoken', verifyToken, async (req, res) => {
   }
 });
 
-// add user
-router.get('/login', async (req, res) => {
+// login user
+router.post('/login', async (req, res) => {
   const {email, password} = req.body;
   try {
     User.findOne({email}, (err, user) => {
       if (err) return res.status(500).send('Server error.');
       if (!user) return res.status(404).send('No user found.');
 
-      var passwordIsValid = bcrypt.compareSync(password, user.password);
+      const passwordIsValid = bcrypt.compareSync(password, user.password);
       if (!passwordIsValid) return res.status(401).send('Wrong credentials.');
 
-      var token = jwt.sign({id: user._id}, SECRET, {
-        expiresIn: 86400, // expires in 24 hours
+      const payload = {id: user._id};
+      const token = jwt.sign(payload, SECRET, {
+        expiresIn: 60,
+      });
+
+      const refreshToken = jwt.sign(payload, REFRESH_SECRET, {
+        expiresIn: 120,
       });
 
       res.status(200).send({
@@ -112,12 +117,39 @@ router.get('/login', async (req, res) => {
         user_id: user._id,
         email: user.email,
         token,
+        refresh_token: refreshToken,
       });
     });
   } catch ({message}) {
     res.json({
       error: message,
     });
+  }
+});
+
+// refresh user's token
+router.post('/refresh-token', async (req, res) => {
+  const {refresh_token} = req.body;
+  try {
+    const decoded = jwt.verify(refresh_token, REFRESH_SECRET);
+    const payload = {id: decoded.id};
+
+    const newToken = jwt.sign(payload, SECRET, {
+      expiresIn: 60,
+    });
+
+    const newRefreshToken = jwt.sign(payload, REFRESH_SECRET, {
+      expiresIn: 120,
+    });
+
+    res.status(200).send({
+      message: 'Refresh token success.',
+      user_id: payload.id,
+      token: newToken,
+      refresh_token: newRefreshToken,
+    });
+  } catch ({message}) {
+    res.status(500).json({error: 'Failed to refresh the token.'});
   }
 });
 
