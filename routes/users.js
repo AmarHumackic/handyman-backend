@@ -8,7 +8,7 @@ const {SECRET, REFRESH_SECRET} = process.env;
 const verifyToken = require('./verifyToken');
 
 // get all users
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -44,6 +44,7 @@ router.post('/register', async (req, res) => {
     last_name,
     email,
     password,
+    address,
     phone_number,
     fcm_tokens,
     city_id,
@@ -53,19 +54,18 @@ router.post('/register', async (req, res) => {
     last_name,
     email,
     password: bcrypt.hashSync(password, 8),
+    address,
     phone_number,
     fcm_tokens,
     city_id,
   });
   try {
     const savedUser = await user.save();
-    // Create a token
-    const token = jwt.sign({id: user._id}, SECRET, {expiresIn: '7d'});
+
     res.json({
       message: 'Registration success.',
       user_id: savedUser._id,
       email: savedUser.email,
-      token,
     });
   } catch ({message}) {
     res.json({
@@ -105,11 +105,11 @@ router.post('/login', async (req, res) => {
 
       const payload = {id: user._id};
       const token = jwt.sign(payload, SECRET, {
-        expiresIn: 60,
+        expiresIn: '7d',
       });
 
       const refreshToken = jwt.sign(payload, REFRESH_SECRET, {
-        expiresIn: 120,
+        expiresIn: '30d',
       });
 
       res.status(200).send({

@@ -4,7 +4,7 @@ const ServiceCategories = require('../models/serviceCategories');
 const verifyToken = require('./verifyToken');
 
 // get all service categories
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const serviceCategories = await ServiceCategories.find();
     res.json(serviceCategories);
@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // get service category by id
-router.get('/:service_category_id', verifyToken, async (req, res) => {
+router.get('/:service_category_id', async (req, res) => {
   try {
     const serviceCategory = await ServiceCategories.findById(
       req.params.service_category_id,

@@ -4,7 +4,7 @@ const UserType = require('../models/userType');
 const verifyToken = require('./verifyToken');
 
 // get all user types
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const userTypes = await UserType.find();
     res.json(userTypes);
@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // get user type by id
-router.get('/:user_type_id', verifyToken, async (req, res) => {
+router.get('/:user_type_id', async (req, res) => {
   try {
     const userType = await UserType.findById(req.params.user_type_id);
     res.json(userType);

@@ -4,7 +4,7 @@ const Country = require('../models/country');
 const verifyToken = require('./verifyToken');
 
 // get all countries
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const country = await Country.find();
     res.json(country);
@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // get country by id
-router.get('/:country_id', verifyToken, async (req, res) => {
+router.get('/:country_id', async (req, res) => {
   try {
     const country = await Country.findById(req.params.country_id);
     res.json(country);

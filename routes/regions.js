@@ -4,7 +4,7 @@ const Region = require('../models/region');
 const verifyToken = require('./verifyToken');
 
 // get all regions
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const regions = await Region.find();
     res.json(regions);
@@ -14,7 +14,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // get region by id
-router.get('/:region_id', verifyToken, async (req, res) => {
+router.get('/:region_id', async (req, res) => {
   try {
     const region = await Region.findById(req.params.region_id);
     res.json(region);

@@ -1,20 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const City = require('../models/city');
+const Region = require('../models/region');
 const verifyToken = require('./verifyToken');
 
 // all cities
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const city = await City.find();
-    res.json(city);
+    const {withRegions} = req.query;
+    if (withRegions === '1' || withRegions === 1) {
+      const regions = await Region.find();
+      const cities = await City.find();
+      res.json({regions, cities});
+    } else {
+      const city = await City.find();
+      res.json(city);
+    }
   } catch ({message}) {
     res.json({error: message});
   }
 });
 
 // get city by id
-router.get('/:city_id', verifyToken, async (req, res) => {
+router.get('/:city_id', async (req, res) => {
   try {
     const city = await City.findById(req.params.city_id);
     res.json(city);

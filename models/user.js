@@ -18,6 +18,10 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  address: {
+    type: String,
+    required: true,
+  },
   phone_number: {
     type: String,
     required: true,
