@@ -45,6 +45,11 @@ const UserSchema = mongoose.Schema({
     required: true,
     default: [],
   },
+  updated_at: {
+    type: Date,
+    required: false,
+    default: null,
+  },
 });
 
 module.exports = mongoose.model('user', UserSchema);

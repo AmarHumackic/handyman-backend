@@ -80,6 +80,7 @@ router.put('/add-fcm-token', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(user_id);
     user.fcm_tokens.push(fcm_token);
+    user.updated_at = new Date();
     await user.save();
 
     res.json({
@@ -160,6 +161,7 @@ router.put('/update-services', verifyToken, async (req, res) => {
     const user = await User.findById(user_id);
     if (services instanceof Array) {
       user.services = [...new Set(services)];
+      user.updated_at = new Date();
       await user.save();
 
       res.json({
