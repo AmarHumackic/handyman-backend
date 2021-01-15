@@ -153,4 +153,26 @@ router.post('/refresh-token', async (req, res) => {
   }
 });
 
+// update services
+router.put('/update-services', verifyToken, async (req, res) => {
+  const {user_id, services} = req.body;
+  try {
+    const user = await User.findById(user_id);
+    if (services instanceof Array) {
+      user.services = [...new Set(services)];
+      await user.save();
+
+      res.json({
+        message: 'Services have been successfully updated.',
+      });
+    } else {
+      throw new Error('Invalid data type, an array of services is required.');
+    }
+  } catch ({message}) {
+    res.json({
+      error: message,
+    });
+  }
+});
+
 module.exports = router;
