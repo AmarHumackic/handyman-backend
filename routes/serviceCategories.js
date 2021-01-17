@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const ServiceCategories = require('../models/serviceCategories');
+const ServiceCategory = require('../models/serviceCategory');
 const verifyToken = require('./verifyToken');
 
 // get all service categories
 router.get('/', async (req, res) => {
   try {
-    const serviceCategories = await ServiceCategories.find();
+    const serviceCategories = await ServiceCategory.find();
     res.json(serviceCategories);
   } catch ({message}) {
     res.status(500).json({error: message});
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 // get service category by id
 router.get('/:service_category_id', async (req, res) => {
   try {
-    const serviceCategory = await ServiceCategories.findById(
+    const serviceCategory = await ServiceCategory.findById(
       req.params.service_category_id,
     );
     res.json(serviceCategory);
@@ -29,7 +29,7 @@ router.get('/:service_category_id', async (req, res) => {
 
 // add service category
 router.post('/', verifyToken, async (req, res) => {
-  const serviceCategory = new ServiceCategories({
+  const serviceCategory = new ServiceCategory({
     name: req.body.name,
     description: req.body.description,
   });

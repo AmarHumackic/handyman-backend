@@ -16,6 +16,7 @@ const userTypesRoute = require('./routes/userTypes');
 const serviceCategoriesRoute = require('./routes/serviceCategories');
 const servicesRoute = require('./routes/services');
 const usersRoute = require('./routes/users');
+const serviceRequestsRoute = require('./routes/serviceRequests');
 
 // env variables
 const {MONGODB_URL, URL_PREFIX} = process.env;
@@ -25,9 +26,10 @@ app.use(`${URL_PREFIX}/countries`, countriesRoute);
 app.use(`${URL_PREFIX}/regions`, regionsRoute);
 app.use(`${URL_PREFIX}/cities`, citiesRoute);
 app.use(`${URL_PREFIX}/usertypes`, userTypesRoute);
-app.use(`${URL_PREFIX}/servicecategories`, serviceCategoriesRoute);
+app.use(`${URL_PREFIX}/service-categories`, serviceCategoriesRoute);
 app.use(`${URL_PREFIX}/services`, servicesRoute);
 app.use(`${URL_PREFIX}/users`, usersRoute);
+app.use(`${URL_PREFIX}/service-requests`, serviceRequestsRoute);
 
 // app.use('/*', (req, res) => {
 //   res.redirect(`${URL_PREFIX}/`);

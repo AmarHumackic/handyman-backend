@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ServiceCategoriesSchema = mongoose.Schema({
+const ServiceCategorySchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -11,4 +11,4 @@ const ServiceCategoriesSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('service_categories', ServiceCategoriesSchema);
+module.exports = mongoose.model('service_category', ServiceCategorySchema);
