@@ -6,14 +6,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {SECRET, REFRESH_SECRET} = process.env;
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // get all users
 router.get('/', async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.status(200).json(success('OK', {users}, res.statusCode));
   } catch ({message}) {
-    res.status(500).json({error: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -23,17 +24,23 @@ router.get('/details', verifyToken, async (req, res) => {
     const user = await User.findById(req.body.user_id);
     const city = await City.findById(user.city_id);
     const {first_name, last_name, email, phone_number} = user;
-    res.json({
-      first_name,
-      last_name,
-      email,
-      phone_number,
-      city: city.name,
-    });
+    res.status(200).json(
+      success(
+        'OK',
+        {
+          first_name,
+          last_name,
+          email,
+          phone_number,
+          city: city.name,
+        },
+        res.statusCode,
+      ),
+    );
   } catch ({message}) {
     message.startsWith('Cast to')
-      ? res.status(404).json({error: 'User not found'})
-      : res.status(500).json({error: message});
+      ? res.status(404).json(error('User not found', res.statusCode))
+      : res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -60,17 +67,21 @@ router.post('/register', async (req, res) => {
     city_id,
   });
   try {
-    const savedUser = await user.save();
+    const newUser = await user.save();
 
-    res.json({
-      message: 'Registration success.',
-      user_id: savedUser._id,
-      email: savedUser.email,
-    });
+    res.status(200).json(
+      success(
+        'OK',
+        {
+          message: 'Registration success.',
+          user_id: newUser._id,
+          email: newUser.email,
+        },
+        res.statusCode,
+      ),
+    );
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -83,13 +94,17 @@ router.put('/add-fcm-token', verifyToken, async (req, res) => {
     user.updated_at = new Date();
     await user.save();
 
-    res.json({
-      message: 'FCM token has been successfully saved.',
-    });
+    res
+      .status(200)
+      .json(
+        success(
+          'OK',
+          {message: 'FCM token has been successfully saved.'},
+          res.statusCode,
+        ),
+      );
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -98,11 +113,16 @@ router.post('/login', async (req, res) => {
   const {email, password} = req.body;
   try {
     User.findOne({email}, (err, user) => {
-      if (err) return res.status(500).send('Server error.');
-      if (!user) return res.status(404).send('No user found.');
+      if (err)
+        return res.status(500).json(error('Server error.', res.statusCode));
+      if (!user)
+        return res.status(404).json(error('No user found.', res.statusCode));
 
       const passwordIsValid = bcrypt.compareSync(password, user.password);
-      if (!passwordIsValid) return res.status(401).send('Wrong credentials.');
+      if (!passwordIsValid)
+        return res
+          .status(401)
+          .json(error('Wrong credentials.', res.statusCode));
 
       const payload = {id: user._id};
       const token = jwt.sign(payload, SECRET, {
@@ -113,18 +133,22 @@ router.post('/login', async (req, res) => {
         expiresIn: '30d',
       });
 
-      res.status(200).send({
-        message: 'Login success.',
-        user_id: user._id,
-        email: user.email,
-        token,
-        refresh_token: refreshToken,
-      });
+      res.status(200).json(
+        success(
+          'OK',
+          {
+            message: 'Login success.',
+            user_id: user._id,
+            email: user.email,
+            token,
+            refresh_token: refreshToken,
+          },
+          res.statusCode,
+        ),
+      );
     });
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -143,14 +167,20 @@ router.post('/refresh-token', async (req, res) => {
       expiresIn: 120,
     });
 
-    res.status(200).send({
-      message: 'Refresh token success.',
-      user_id: payload.id,
-      token: newToken,
-      refresh_token: newRefreshToken,
-    });
+    res.status(200).json(
+      success(
+        'OK',
+        {
+          message: 'Refresh token success.',
+          user_id: payload.id,
+          token: newToken,
+          refresh_token: newRefreshToken,
+        },
+        res.statusCode,
+      ),
+    );
   } catch ({message}) {
-    res.status(500).json({error: 'Failed to refresh the token.'});
+    res.status(500).json(error('Failed to refresh the token.', res.statusCode));
   }
 });
 
@@ -164,16 +194,27 @@ router.put('/update-services', verifyToken, async (req, res) => {
       user.updated_at = new Date();
       await user.save();
 
-      res.json({
-        message: 'Services have been successfully updated.',
-      });
+      res.status(200).json(
+        success(
+          'OK',
+          {
+            message: 'Services have been successfully updated.',
+          },
+          res.statusCode,
+        ),
+      );
     } else {
-      throw new Error('Invalid data type, an array of services is required.');
+      res
+        .status(400)
+        .json(
+          error(
+            'Invalid data type, an array of services is required.',
+            res.statusCode,
+          ),
+        );
     }
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 

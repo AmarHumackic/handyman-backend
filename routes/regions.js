@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Region = require('../models/region');
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // get all regions
 router.get('/', async (req, res) => {
   try {
     const regions = await Region.find();
-    res.json(regions);
+    res.status(200).json(success('OK', {regions}, res.statusCode));
   } catch ({message}) {
-    res.status(500).json({error: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -17,11 +18,11 @@ router.get('/', async (req, res) => {
 router.get('/:region_id', async (req, res) => {
   try {
     const region = await Region.findById(req.params.region_id);
-    res.json(region);
+    res.status(200).json(success('OK', {region}, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
-      ? res.status(404).json({error: 'Region not found'})
-      : res.status(500).json({error: message});
+      ? res.status(404).json(error('Region not found', res.statusCode))
+      : res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -32,12 +33,10 @@ router.post('/', verifyToken, async (req, res) => {
     country_id: req.body.country_id,
   });
   try {
-    const savedRegion = await region.save();
-    res.json(savedRegion);
+    const newRegion = await region.save();
+    res.status(200).json(success('OK', {newRegion}, res.statusCode));
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 

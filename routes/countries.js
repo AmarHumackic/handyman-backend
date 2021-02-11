@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Country = require('../models/country');
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // get all countries
 router.get('/', async (req, res) => {
   try {
     const country = await Country.find();
-    res.json(country);
-  } catch (err) {
-    res.status(500).json({message: err.message});
+    res.status(200).json(success('OK', {country}, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -17,11 +18,11 @@ router.get('/', async (req, res) => {
 router.get('/:country_id', async (req, res) => {
   try {
     const country = await Country.findById(req.params.country_id);
-    res.json(country);
+    res.status(200).json(success('OK', {country}, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
-      ? res.status(404).json({error: 'Country not found'})
-      : res.status(500).json({error: message});
+      ? res.status(404).json(error('Country not found', res.statusCode))
+      : res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -32,12 +33,10 @@ router.post('/', verifyToken, async (req, res) => {
     code: req.body.code,
   });
   try {
-    const savedCountry = await country.save();
-    res.json(savedCountry);
+    const newCountry = await country.save();
+    res.status(200).json(success('OK', {newCountry}, res.statusCode));
   } catch ({message}) {
-    res.status(500).json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -48,19 +47,19 @@ router.patch('/:country_id', verifyToken, async (req, res) => {
       {_id: req.params.country_id},
       {$set: {name: req.body.name, code: req.body.code}},
     );
-    res.json(updatedCountry);
-  } catch (err) {
-    res.json({message: err});
+    res.status(200).json(success('OK', {updatedCountry}, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
 // delete country
 router.delete('/:country_id', verifyToken, async (req, res) => {
   try {
-    const removedCountry = await Country.remove({_id: req.params.country_id});
-    res.json(removedCountry);
-  } catch (err) {
-    res.json({message: err});
+    const deletedCountry = await Country.remove({_id: req.params.country_id});
+    res.status(200).json(success('OK', {deletedCountry}, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 

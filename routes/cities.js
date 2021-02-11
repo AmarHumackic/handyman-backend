@@ -3,6 +3,7 @@ const router = express.Router();
 const City = require('../models/city');
 const Region = require('../models/region');
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // all cities
 router.get('/', async (req, res) => {
@@ -11,13 +12,13 @@ router.get('/', async (req, res) => {
     if (withRegions === '1' || withRegions === 1) {
       const regions = await Region.find();
       const cities = await City.find();
-      res.json({regions, cities});
+      res.status(200).json(success('OK', {regions, cities}, res.statusCode));
     } else {
       const city = await City.find();
-      res.json(city);
+      res.status(200).json(success('OK', {city}, res.statusCode));
     }
   } catch ({message}) {
-    res.json({error: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -25,11 +26,11 @@ router.get('/', async (req, res) => {
 router.get('/:city_id', async (req, res) => {
   try {
     const city = await City.findById(req.params.city_id);
-    res.json(city);
+    res.status(200).json(success('OK', {city}, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
-      ? res.status(404).json({error: 'City not found'})
-      : res.status(500).json({error: message});
+      ? res.status(404).json(error('City not found', res.statusCode))
+      : res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -40,10 +41,10 @@ router.post('/', verifyToken, async (req, res) => {
     region_id: req.body.region_id,
   });
   try {
-    const savedCity = await city.save();
-    res.json(savedCity);
+    const newCity = await city.save();
+    res.status(200).json(success('OK', {newCity}, res.statusCode));
   } catch ({message}) {
-    res.json({error: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -54,19 +55,19 @@ router.patch('/:city_id', verifyToken, async (req, res) => {
       {_id: req.params.city_id},
       {$set: {name: req.body.name}},
     );
-    res.json(updatedCity);
-  } catch (err) {
-    res.json({message: err});
+    res.status(200).json(success('OK', {updatedCity}, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
 // delete city
 router.delete('/:city_id', verifyToken, async (req, res) => {
   try {
-    const removedCity = await City.remove({_id: req.params.city_id});
-    res.json(removedCity);
+    const deletedCity = await City.remove({_id: req.params.city_id});
+    res.status(200).json(success('OK', {deletedCity}, res.statusCode));
   } catch ({message}) {
-    res.json({erro: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 

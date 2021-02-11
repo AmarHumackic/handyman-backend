@@ -4,6 +4,7 @@ const ServiceRequest = require('../models/serviceRequest');
 const Service = require('../models/service');
 const User = require('../models/user');
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // add service request
 router.post('/', verifyToken, async (req, res) => {
@@ -30,12 +31,10 @@ router.post('/', verifyToken, async (req, res) => {
       service_id,
       creator_id,
     });
-    const savedServiceRequest = await serviceRequest.save();
-    res.json(savedServiceRequest);
+    const newServiceRequest = await serviceRequest.save();
+    res.status(200).json(success('OK', {newServiceRequest}, res.statusCode));
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 

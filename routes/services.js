@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Service = require('../models/service');
 const verifyToken = require('./verifyToken');
+const {success, error} = require('../utils/responseApi');
 
 // get all services
 router.get('/', async (req, res) => {
   try {
     const services = await Service.find();
-    res.json(services);
+    res.status(200).json(success('OK', {services}, res.statusCode));
   } catch ({message}) {
-    res.status(500).json({error: message});
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -17,11 +18,11 @@ router.get('/', async (req, res) => {
 router.get('/:service_id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.service_id);
-    res.json(service);
+    res.status(200).json(success('OK', {service}, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
-      ? res.status(404).json({error: 'Service not found'})
-      : res.status(500).json({error: message});
+      ? res.status(404).json(error('Service not found', res.statusCode))
+      : res.status(500).json(error(message, res.statusCode));
   }
 });
 
@@ -33,12 +34,10 @@ router.post('/', verifyToken, async (req, res) => {
     service_category_id: req.body.service_category_id,
   });
   try {
-    const savedService = await service.save();
-    res.json(savedService);
+    const newService = await service.save();
+    res.status(200).json(success('OK', {newService}, res.statusCode));
   } catch ({message}) {
-    res.json({
-      error: message,
-    });
+    res.status(500).json(error(message, res.statusCode));
   }
 });
 
