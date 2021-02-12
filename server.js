@@ -3,20 +3,21 @@ var cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+// const path = require('path');
 require('dotenv/config');
 
 app.use(bodyParser.json());
 app.use(cors());
 
 // Import routes
-const countriesRoute = require('./routes/countries');
-const regionsRoute = require('./routes/regions');
-const citiesRoute = require('./routes/cities');
-const userTypesRoute = require('./routes/userTypes');
-const serviceCategoriesRoute = require('./routes/serviceCategories');
-const servicesRoute = require('./routes/services');
-const usersRoute = require('./routes/users');
-const serviceRequestsRoute = require('./routes/serviceRequests');
+const countriesRoute = require('./src/routes/countries');
+const regionsRoute = require('./src/routes/regions');
+const citiesRoute = require('./src/routes/cities');
+const userTypesRoute = require('./src/routes/userTypes');
+const serviceCategoriesRoute = require('./src/routes/serviceCategories');
+const servicesRoute = require('./src/routes/services');
+const usersRoute = require('./src/routes/users');
+const serviceRequestsRoute = require('./src/routes/serviceRequests');
 
 // env variables
 const {MONGODB_URL, URL_PREFIX} = process.env;
@@ -31,13 +32,9 @@ app.use(`${URL_PREFIX}/services`, servicesRoute);
 app.use(`${URL_PREFIX}/users`, usersRoute);
 app.use(`${URL_PREFIX}/service-requests`, serviceRequestsRoute);
 
-// app.use('/*', (req, res) => {
-//   res.redirect(`${URL_PREFIX}/`);
-// });
+app.use('/uploads', express.static('uploads')); // Make uploads folder public - accessible via URL
 
 app.get(`${URL_PREFIX}`, (req, res) => {
-  // res.send('Elektronicko poslovanje (Grupa 7) - API');
-  // res.redirect(`${URL_PREFIX}/`);
   res.sendFile(__dirname + '/index.html');
 });
 

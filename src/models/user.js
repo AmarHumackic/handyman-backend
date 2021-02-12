@@ -1,49 +1,53 @@
 const mongoose = require('mongoose');
 
-const ServiceRequestsSchema = mongoose.Schema({
-  title: {
+const UserSchema = mongoose.Schema({
+  first_name: {
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: false,
-  },
-  start_date: {
-    type: Date,
-    required: true,
-  },
-  due_date: {
-    type: Date,
-    required: true,
-  },
-  service_id: {
+  last_name: {
     type: String,
     required: true,
   },
-  creator_id: {
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
     type: String,
     required: true,
   },
-  servicer_id: {
+  address: {
     type: String,
-    required: false,
-    default: null,
-  },
-  completed: {
-    type: Boolean,
     required: true,
-    default: false,
   },
-  feedback_left: {
-    type: Boolean,
+  phone_number: {
+    type: String,
     required: true,
-    default: false,
+  },
+  fcm_tokens: {
+    type: [String],
+    required: true,
+    default: [],
+  },
+  city_id: {
+    type: String,
+    required: true,
   },
   created_at: {
     type: Date,
     required: true,
     default: Date.now,
+  },
+  services: {
+    type: [String],
+    required: true,
+    default: [],
+  },
+  profile_img: {
+    type: String,
+    required: false,
   },
   updated_at: {
     type: Date,
@@ -52,4 +56,4 @@ const ServiceRequestsSchema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('service_request', ServiceRequestsSchema);
+module.exports = mongoose.model('user', UserSchema);

@@ -7,6 +7,34 @@ const bcrypt = require('bcryptjs');
 const {SECRET, REFRESH_SECRET} = process.env;
 const verifyToken = require('./verifyToken');
 const {success, error} = require('../utils/responseApi');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + file.originalname); // can be any of the names, e.g new Date().toISOString() + file.originalname;
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true);
+  } else {
+    // throw an error if needed
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024,
+  },
+  fileFilter,
+});
 
 // get all users
 router.get('/', async (req, res) => {
@@ -45,7 +73,8 @@ router.get('/details', verifyToken, async (req, res) => {
 });
 
 // register user
-router.post('/register', async (req, res) => {
+router.post('/register', upload.single('profile_img'), async (req, res) => {
+  console.log('req.file', req.file);
   const {
     first_name,
     last_name,
@@ -65,6 +94,7 @@ router.post('/register', async (req, res) => {
     phone_number,
     fcm_tokens,
     city_id,
+    profile_img: req.file.path,
   });
   try {
     const newUser = await user.save();

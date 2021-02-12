@@ -5,6 +5,21 @@ const Service = require('../models/service');
 const User = require('../models/user');
 const verifyToken = require('./verifyToken');
 const {success, error} = require('../utils/responseApi');
+const getPagination = require('../utils/pagination');
+
+// get all service requests
+router.get('/', async (req, res) => {
+  const {page, size} = req.query;
+  const {limit, offset} = getPagination(page, size);
+
+  try {
+    // const serviceRequests = await ServiceRequest.find();
+    const serviceRequests = await ServiceRequest.paginate({}, {offset, limit});
+    res.status(200).json(success('OK', {serviceRequests}, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
 
 // add service request
 router.post('/', verifyToken, async (req, res) => {
