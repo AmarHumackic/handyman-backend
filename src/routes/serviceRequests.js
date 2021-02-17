@@ -9,6 +9,7 @@ const getPagination = require('../utils/pagination');
 
 // get all service requests
 router.get('/', async (req, res) => {
+  // use lean() for faster queries
   const {page, size} = req.query;
   const {limit, offset} = getPagination(page, size);
 

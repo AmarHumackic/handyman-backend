@@ -7,7 +7,7 @@ const {success, error} = require('../utils/responseApi');
 // get all regions
 router.get('/', async (req, res) => {
   try {
-    const regions = await Region.find();
+    const regions = await Region.find(); // use lean() for faster queries
     res.status(200).json(success('OK', {regions}, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));

@@ -10,8 +10,8 @@ router.get('/', async (req, res) => {
   try {
     const {withRegions} = req.query;
     if (withRegions === '1' || withRegions === 1) {
-      const regions = await Region.find();
-      const cities = await City.find();
+      const regions = await Region.find(); // use lean() for faster queries
+      const cities = await City.find(); // use lean() for faster queries
       res.status(200).json(success('OK', {regions, cities}, res.statusCode));
     } else {
       const city = await City.find();
