@@ -8,7 +8,7 @@ const {success, error} = require('../utils/responseApi');
 router.get('/', async (req, res) => {
   try {
     const serviceCategories = await ServiceCategory.find();
-    res.status(200).json(success('OK', {serviceCategories}, res.statusCode));
+    res.status(200).json(success('OK', serviceCategories, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -20,7 +20,7 @@ router.get('/:service_category_id', async (req, res) => {
     const serviceCategory = await ServiceCategory.findById(
       req.params.service_category_id,
     );
-    res.status(200).json(success('OK', {serviceCategory}, res.statusCode));
+    res.status(200).json(success('OK', serviceCategory, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
       ? res
@@ -38,7 +38,7 @@ router.post('/', verifyToken, async (req, res) => {
   });
   try {
     const newServiceCategory = await serviceCategory.save();
-    res.status(200).json(success('OK', {newServiceCategory}, res.statusCode));
+    res.status(200).json(success('OK', newServiceCategory, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }

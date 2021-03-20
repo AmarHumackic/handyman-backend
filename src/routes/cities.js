@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
       res.status(200).json(success('OK', {regions, cities}, res.statusCode));
     } else {
       const city = await City.find();
-      res.status(200).json(success('OK', {city}, res.statusCode));
+      res.status(200).json(success('OK', city, res.statusCode));
     }
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 router.get('/:city_id', async (req, res) => {
   try {
     const city = await City.findById(req.params.city_id);
-    res.status(200).json(success('OK', {city}, res.statusCode));
+    res.status(200).json(success('OK', city, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
       ? res.status(404).json(error('City not found', res.statusCode))
@@ -42,20 +42,20 @@ router.post('/', verifyToken, async (req, res) => {
   });
   try {
     const newCity = await city.save();
-    res.status(200).json(success('OK', {newCity}, res.statusCode));
+    res.status(200).json(success('OK', newCity, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
 });
 
 // update city
-router.patch('/:city_id', verifyToken, async (req, res) => {
+router.put('/:city_id', verifyToken, async (req, res) => {
   try {
     const updatedCity = await City.updateOne(
       {_id: req.params.city_id},
       {$set: {name: req.body.name}},
     );
-    res.status(200).json(success('OK', {updatedCity}, res.statusCode));
+    res.status(200).json(success('OK', updatedCity, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -65,7 +65,7 @@ router.patch('/:city_id', verifyToken, async (req, res) => {
 router.delete('/:city_id', verifyToken, async (req, res) => {
   try {
     const deletedCity = await City.remove({_id: req.params.city_id});
-    res.status(200).json(success('OK', {deletedCity}, res.statusCode));
+    res.status(200).json(success('OK', deletedCity, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }

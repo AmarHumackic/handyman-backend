@@ -40,7 +40,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const users = await User.find();
-    res.status(200).json(success('OK', {users}, res.statusCode));
+    res.status(200).json(success('OK', users, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -73,7 +73,7 @@ router.get('/details', verifyToken, async (req, res) => {
 });
 
 // register user
-router.post('/register', upload.single('profile_img'), async (req, res) => {
+router.post('/register', async (req, res) => {
   console.log('req.file', req.file);
   const {
     first_name,
@@ -94,7 +94,7 @@ router.post('/register', upload.single('profile_img'), async (req, res) => {
     phone_number,
     fcm_tokens,
     city_id,
-    profile_img: req.file.path,
+    // profile_img: req.file.path || null,
   });
   try {
     const newUser = await user.save();

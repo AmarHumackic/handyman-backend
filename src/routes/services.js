@@ -8,7 +8,7 @@ const {success, error} = require('../utils/responseApi');
 router.get('/', async (req, res) => {
   try {
     const services = await Service.find();
-    res.status(200).json(success('OK', {services}, res.statusCode));
+    res.status(200).json(success('OK', services, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.get('/:service_id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.service_id);
-    res.status(200).json(success('OK', {service}, res.statusCode));
+    res.status(200).json(success('OK', service, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
       ? res.status(404).json(error('Service not found', res.statusCode))
@@ -35,7 +35,7 @@ router.post('/', verifyToken, async (req, res) => {
   });
   try {
     const newService = await service.save();
-    res.status(200).json(success('OK', {newService}, res.statusCode));
+    res.status(200).json(success('OK', newService, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }

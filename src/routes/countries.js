@@ -8,7 +8,7 @@ const {success, error} = require('../utils/responseApi');
 router.get('/', async (req, res) => {
   try {
     const country = await Country.find();
-    res.status(200).json(success('OK', {country}, res.statusCode));
+    res.status(200).json(success('OK', country, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.get('/:country_id', async (req, res) => {
   try {
     const country = await Country.findById(req.params.country_id);
-    res.status(200).json(success('OK', {country}, res.statusCode));
+    res.status(200).json(success('OK', country, res.statusCode));
   } catch ({message}) {
     message.startsWith('Cast to')
       ? res.status(404).json(error('Country not found', res.statusCode))
@@ -34,20 +34,20 @@ router.post('/', verifyToken, async (req, res) => {
   });
   try {
     const newCountry = await country.save();
-    res.status(200).json(success('OK', {newCountry}, res.statusCode));
+    res.status(200).json(success('OK', newCountry, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
 });
 
 // update country
-router.patch('/:country_id', verifyToken, async (req, res) => {
+router.put('/:country_id', verifyToken, async (req, res) => {
   try {
     const updatedCountry = await Country.updateOne(
       {_id: req.params.country_id},
       {$set: {name: req.body.name, code: req.body.code}},
     );
-    res.status(200).json(success('OK', {updatedCountry}, res.statusCode));
+    res.status(200).json(success('OK', updatedCountry, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -57,7 +57,7 @@ router.patch('/:country_id', verifyToken, async (req, res) => {
 router.delete('/:country_id', verifyToken, async (req, res) => {
   try {
     const deletedCountry = await Country.remove({_id: req.params.country_id});
-    res.status(200).json(success('OK', {deletedCountry}, res.statusCode));
+    res.status(200).json(success('OK', deletedCountry, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }

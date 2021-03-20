@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
   try {
     // const serviceRequests = await ServiceRequest.find();
     const serviceRequests = await ServiceRequest.paginate({}, {offset, limit});
-    res.status(200).json(success('OK', {serviceRequests}, res.statusCode));
+    res.status(200).json(success('OK', serviceRequests, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
@@ -48,7 +48,7 @@ router.post('/', verifyToken, async (req, res) => {
       creator_id,
     });
     const newServiceRequest = await serviceRequest.save();
-    res.status(200).json(success('OK', {newServiceRequest}, res.statusCode));
+    res.status(200).json(success('OK', newServiceRequest, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
