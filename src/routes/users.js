@@ -170,7 +170,7 @@ router.post('/login', async (req, res) => {
             message: 'Login success.',
             user_id: user._id,
             email: user.email,
-            token,
+            access_token: token,
             refresh_token: refreshToken,
           },
           res.statusCode,
@@ -203,7 +203,7 @@ router.post('/refresh-token', async (req, res) => {
         {
           message: 'Refresh token success.',
           user_id: payload.id,
-          token: newToken,
+          access_token: newToken,
           refresh_token: newRefreshToken,
         },
         res.statusCode,
