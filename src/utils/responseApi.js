@@ -5,12 +5,12 @@
  * @param   {object | array} results
  * @param   {number} statusCode
  */
-exports.success = (message, results, statusCode) => {
+exports.success = (message, data, statusCode) => {
   return {
-    message,
+    message: 'OK',
     error: false,
     code: statusCode,
-    results,
+    data,
   };
 };
 
