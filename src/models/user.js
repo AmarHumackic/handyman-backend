@@ -20,11 +20,11 @@ const UserSchema = mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
+    required: false,
   },
   phone_number: {
     type: String,
-    required: true,
+    required: false,
   },
   fcm_tokens: {
     type: [String],
