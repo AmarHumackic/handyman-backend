@@ -40,4 +40,16 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
+// delete region
+router.delete('/:region_id', verifyToken, async (req, res) => {
+  try {
+    const deletedRegion = await Region.remove({
+      _id: req.params.region_id,
+    });
+    res.status(200).json(success('OK', deletedRegion, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
 module.exports = router;
