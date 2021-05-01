@@ -44,4 +44,16 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
+// delete service category
+router.delete('/:service_category_id', verifyToken, async (req, res) => {
+  try {
+    const deletedServiceCategory = await ServiceCategory.remove({
+      _id: req.params.service_category_id,
+    });
+    res.status(200).json(success('OK', deletedServiceCategory, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
 module.exports = router;
