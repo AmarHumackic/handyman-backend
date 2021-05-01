@@ -41,4 +41,16 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
+// delete service
+router.delete('/:service_id', verifyToken, async (req, res) => {
+  try {
+    const deletedService = await Service.remove({
+      _id: req.params.service_id,
+    });
+    res.status(200).json(success('OK', deletedService, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
 module.exports = router;
