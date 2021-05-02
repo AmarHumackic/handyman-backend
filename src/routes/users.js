@@ -39,7 +39,7 @@ const upload = multer({
 // get all users
 router.get('/', async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password');
     res.status(200).json(success('OK', users, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
@@ -49,18 +49,37 @@ router.get('/', async (req, res) => {
 // get logged user details
 router.get('/details', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.body.user_id);
+    const user = await User.findById(req.body.user_id).select('-password');
     const city = await City.findById(user.city_id);
-    const {first_name, last_name, email, phone_number} = user;
+    const {
+      _id,
+      first_name,
+      last_name,
+      email,
+      address,
+      phone_number,
+      city_id,
+      fcm_tokens,
+      services,
+      created_at,
+      updated_at,
+    } = user;
     res.status(200).json(
       success(
         'OK',
         {
+          _id,
           first_name,
           last_name,
           email,
+          address,
           phone_number,
-          city: city.name,
+          city_id,
+          fcm_tokens,
+          services,
+          created_at,
+          updated_at,
+          city_name: city.name,
         },
         res.statusCode,
       ),
@@ -74,7 +93,7 @@ router.get('/details', verifyToken, async (req, res) => {
 
 // register user
 router.post('/register', async (req, res) => {
-  console.log('req.file', req.file);
+  // console.log('req.file', req.file);
   const {
     first_name,
     last_name,
@@ -104,7 +123,7 @@ router.post('/register', async (req, res) => {
         'OK',
         {
           message: 'Registration success.',
-          user_id: newUser._id,
+          _id: newUser._id,
           email: newUser.email,
         },
         res.statusCode,
@@ -168,7 +187,7 @@ router.post('/login', async (req, res) => {
           'OK',
           {
             message: 'Login success.',
-            user_id: user._id,
+            _id: user._id,
             email: user.email,
             access_token: token,
             refresh_token: refreshToken,
@@ -202,7 +221,7 @@ router.post('/refresh-token', async (req, res) => {
         'OK',
         {
           message: 'Refresh token success.',
-          user_id: payload.id,
+          _id: payload.id,
           access_token: newToken,
           refresh_token: newRefreshToken,
         },
@@ -243,6 +262,18 @@ router.put('/update-services', verifyToken, async (req, res) => {
           ),
         );
     }
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
+// delete user
+router.delete('/:user_id', verifyToken, async (req, res) => {
+  try {
+    const deletedUser = await User.remove({
+      _id: req.params.user_id,
+    });
+    res.status(200).json(success('OK', deletedUser, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
