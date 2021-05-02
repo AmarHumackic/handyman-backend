@@ -39,7 +39,45 @@ const upload = multer({
 // get all users
 router.get('/', async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find().select('-password').lean();
+    // const cities = await City.find().lean();
+    // const usersResponse = [];
+    // users.forEach((user) => {
+    //   const {
+    //     _id,
+    //     first_name,
+    //     last_name,
+    //     email,
+    //     address,
+    //     phone_number,
+    //     city_id,
+    //     fcm_tokens,
+    //     services,
+    //     created_at,
+    //     updated_at,
+    //   } = user;
+    //   console.log(`cities`, cities);
+    //   usersResponse.push({
+    //     _id,
+    //     first_name,
+    //     last_name,
+    //     email,
+    //     address,
+    //     phone_number,
+    //     city_id,
+    //     fcm_tokens,
+    //     services,
+    //     created_at,
+    //     updated_at,
+    //     city_name: cities.map((c) => {
+    //       console.log(`c`, c._id, city_id);
+    //       if (c._id === city_id) {
+    //         console.log('city is the same ');
+    //         return c.name;
+    //       }
+    //     }),
+    //   });
+    // });
     res.status(200).json(success('OK', users, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
@@ -47,9 +85,9 @@ router.get('/', async (req, res) => {
 });
 
 // get logged user details
-router.get('/details', verifyToken, async (req, res) => {
+router.get('/details/:user_id', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.body.user_id).select('-password');
+    const user = await User.findById(req.params.user_id).select('-password');
     const city = await City.findById(user.city_id);
     const {
       _id,
