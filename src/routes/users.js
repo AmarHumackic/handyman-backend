@@ -8,6 +8,7 @@ const {SECRET, REFRESH_SECRET} = process.env;
 const verifyToken = require('./verifyToken');
 const {success, error} = require('../utils/responseApi');
 const multer = require('multer');
+const city = require('../models/city');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -40,45 +41,38 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const users = await User.find().select('-password').lean();
-    // const cities = await City.find().lean();
-    // const usersResponse = [];
-    // users.forEach((user) => {
-    //   const {
-    //     _id,
-    //     first_name,
-    //     last_name,
-    //     email,
-    //     address,
-    //     phone_number,
-    //     city_id,
-    //     fcm_tokens,
-    //     services,
-    //     created_at,
-    //     updated_at,
-    //   } = user;
-    //   console.log(`cities`, cities);
-    //   usersResponse.push({
-    //     _id,
-    //     first_name,
-    //     last_name,
-    //     email,
-    //     address,
-    //     phone_number,
-    //     city_id,
-    //     fcm_tokens,
-    //     services,
-    //     created_at,
-    //     updated_at,
-    //     city_name: cities.map((c) => {
-    //       console.log(`c`, c._id, city_id);
-    //       if (c._id === city_id) {
-    //         console.log('city is the same ');
-    //         return c.name;
-    //       }
-    //     }),
-    //   });
-    // });
-    res.status(200).json(success('OK', users, res.statusCode));
+    const cities = await City.find().lean();
+
+    const usersResponse = users.map((user) => {
+      const {
+        _id,
+        first_name,
+        last_name,
+        email,
+        address,
+        phone_number,
+        city_id,
+        fcm_tokens,
+        services,
+        created_at,
+        updated_at,
+      } = user;
+      return {
+        _id,
+        first_name,
+        last_name,
+        email,
+        address,
+        phone_number,
+        city_id,
+        fcm_tokens,
+        services,
+        created_at,
+        updated_at,
+        city_name: cities.find((c) => c._id.toString() === city_id).name,
+      };
+    });
+    res.status(200).json(success('OK', usersResponse, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
