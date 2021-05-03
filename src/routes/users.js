@@ -42,7 +42,6 @@ router.get('/', async (req, res) => {
   try {
     const users = await User.find().select('-password').lean();
     const cities = await City.find().lean();
-
     const usersResponse = users.map((user) => {
       const {
         _id,
@@ -57,6 +56,8 @@ router.get('/', async (req, res) => {
         created_at,
         updated_at,
       } = user;
+      const city = cities.find((c) => c._id.toString() === city_id);
+      const cityName = city ? city.name : null;
       return {
         _id,
         first_name,
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
         services,
         created_at,
         updated_at,
-        city_name: cities.find((c) => c._id.toString() === city_id).name,
+        city_name: cityName,
       };
     });
     res.status(200).json(success('OK', usersResponse, res.statusCode));
