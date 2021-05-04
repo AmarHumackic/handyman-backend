@@ -148,31 +148,38 @@ router.post('/register', async (req, res) => {
     fcm_tokens,
     city_id,
   } = req.body;
-  const user = new User({
-    first_name,
-    last_name,
-    email,
-    password: bcrypt.hashSync(password, 8),
-    address,
-    phone_number,
-    fcm_tokens,
-    city_id,
-    // profile_img: req.file.path || null,
-  });
-  try {
-    const newUser = await user.save();
+  const cities = await City.find().lean();
 
-    res.status(200).json(
-      success(
-        'OK',
-        {
-          message: 'Registration success.',
-          _id: newUser._id,
-          email: newUser.email,
-        },
-        res.statusCode,
-      ),
-    );
+  try {
+    const cityExist = cities.find((c) => c._id.toString() === city_id);
+    if (!cityExist) {
+      res.status(404).json(error('City is not found', res.statusCode));
+    } else {
+      const user = new User({
+        first_name,
+        last_name,
+        email,
+        password: bcrypt.hashSync(password, 8),
+        address,
+        phone_number,
+        fcm_tokens,
+        city_id,
+        // profile_img: req.file.path || null,
+      });
+      const newUser = await user.save();
+
+      res.status(200).json(
+        success(
+          'OK',
+          {
+            message: 'Registration success.',
+            _id: newUser._id,
+            email: newUser.email,
+          },
+          res.statusCode,
+        ),
+      );
+    }
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
