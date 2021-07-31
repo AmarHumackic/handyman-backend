@@ -112,4 +112,37 @@ router.get('/:user_id/jobs', async (req, res) => {
   }
 });
 
+// complete service request (job)
+router.post('/complete', verifyToken, async (req, res) => {
+  const {service_request_id, user_id} = req.body;
+  try {
+    if (!service_request_id || !user_id)
+      throw new Error('service_request_id and user_id can not be empty.');
+
+    const serviceRequest = await ServiceRequest.findById({
+      _id: service_request_id,
+    });
+    if (!serviceRequest) throw new Error('Service request does not exist.');
+
+    if (!serviceRequest.servicer_id)
+      throw new Error('A job without a servicer can not be completed.');
+
+    const user = await User.findById({_id: user_id});
+    if (!user) throw new Error('User does not exist.');
+
+    console.log(`user._id`, user._id);
+    console.log(`serviceRequest.creator_id`, serviceRequest.creator_id);
+    if (user_id !== serviceRequest.creator_id)
+      throw new Error('Only the job creator can mark the job as completed.');
+
+    // edit service request to add servicer_id
+    serviceRequest.completed = true;
+    serviceRequest.updated_at = new Date();
+    await serviceRequest.save();
+    res.status(200).json(success('OK', serviceRequest, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
 module.exports = router;
