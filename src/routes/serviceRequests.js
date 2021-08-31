@@ -6,6 +6,8 @@ const User = require('../models/user');
 const verifyToken = require('./verifyToken');
 const {success, error} = require('../utils/responseApi');
 const getPagination = require('../utils/pagination');
+var jwt = require('jsonwebtoken');
+const {SECRET} = process.env;
 
 // get all service requests
 router.get('/', async (req, res) => {
@@ -130,8 +132,6 @@ router.post('/complete', verifyToken, async (req, res) => {
     const user = await User.findById({_id: user_id});
     if (!user) throw new Error('User does not exist.');
 
-    console.log(`user._id`, user._id);
-    console.log(`serviceRequest.creator_id`, serviceRequest.creator_id);
     if (user_id !== serviceRequest.creator_id)
       throw new Error('Only the job creator can mark the job as completed.');
 
@@ -140,6 +140,40 @@ router.post('/complete', verifyToken, async (req, res) => {
     serviceRequest.updated_at = new Date();
     await serviceRequest.save();
     res.status(200).json(success('OK', serviceRequest, res.statusCode));
+  } catch ({message}) {
+    res.status(500).json(error(message, res.statusCode));
+  }
+});
+
+// delete service request
+router.delete('/:service_request_id', verifyToken, async (req, res) => {
+  try {
+    const serviceRequest = await ServiceRequest.findById({
+      _id: req.params.service_request_id,
+    });
+    if (!serviceRequest) throw new Error('Service request does not exist.');
+
+    const token = req.headers['x-access-token'];
+    jwt.verify(token, SECRET, async (err, decoded) => {
+      if (err)
+        return res.status(500).send({error: 'Failed to authenticate token.'});
+
+      // if everything good, save to request for use in other routes
+
+      console.log(`decoded`, decoded);
+      if (serviceRequest.creator_id !== decoded.id) {
+        throw new Error('Service request can be deleted only by a creator');
+      }
+
+      const deletedServiceRequest = await ServiceRequest.remove({
+        _id: req.params.service_request_id,
+      });
+
+      console.log(`deletedServiceRequest`, deletedServiceRequest);
+      res
+        .status(200)
+        .json(success('OK', deletedServiceRequest, res.statusCode));
+    });
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
