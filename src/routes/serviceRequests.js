@@ -12,15 +12,24 @@ const {SECRET} = process.env;
 // get all service requests
 router.get('/', async (req, res) => {
   // use lean() for faster queries
-  const {page, size} = req.query;
+  const {page, size, id} = req.query;
   const {limit, offset} = getPagination(page, size);
 
   try {
     // const serviceRequests = await ServiceRequest.find();
-    const serviceRequests = await ServiceRequest.paginate(
-      {servicer_id: null},
-      {offset, limit},
-    );
+    const params = {
+      servicer_id: null,
+    };
+    if (id) {
+      params.creator_id = {$nin: id};
+    }
+    const serviceRequests = await ServiceRequest.paginate(params, {
+      offset,
+      limit,
+      sort: {
+        created_at: -1,
+      },
+    });
     res.status(200).json(success('OK', serviceRequests, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
@@ -37,7 +46,13 @@ router.get('/:user_id', async (req, res) => {
     // const serviceRequests = await ServiceRequest.find();
     const serviceRequests = await ServiceRequest.paginate(
       {creator_id: req.params.user_id},
-      {offset, limit},
+      {
+        offset,
+        limit,
+        sort: {
+          created_at: -1,
+        },
+      },
     );
     res.status(200).json(success('OK', serviceRequests, res.statusCode));
   } catch ({message}) {
@@ -106,7 +121,13 @@ router.get('/:user_id/jobs', async (req, res) => {
     // const serviceRequests = await ServiceRequest.find();
     const serviceRequests = await ServiceRequest.paginate(
       {servicer_id: req.params.user_id},
-      {offset, limit},
+      {
+        offset,
+        limit,
+        sort: {
+          created_at: -1,
+        },
+      },
     );
     res.status(200).json(success('OK', serviceRequests, res.statusCode));
   } catch ({message}) {
@@ -160,7 +181,6 @@ router.delete('/:service_request_id', verifyToken, async (req, res) => {
 
       // if everything good, save to request for use in other routes
 
-      console.log(`decoded`, decoded);
       if (serviceRequest.creator_id !== decoded.id) {
         throw new Error('Service request can be deleted only by a creator');
       }
@@ -169,7 +189,6 @@ router.delete('/:service_request_id', verifyToken, async (req, res) => {
         _id: req.params.service_request_id,
       });
 
-      console.log(`deletedServiceRequest`, deletedServiceRequest);
       res
         .status(200)
         .json(success('OK', deletedServiceRequest, res.statusCode));
