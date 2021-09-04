@@ -82,7 +82,8 @@ router.get('/', async (req, res) => {
 // get logged user details
 router.get('/details/:user_id', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.params.user_id).select('-password');
+    const user = await User.findById({_id: req.params.user_id});
+    if (!user) throw new Error('User does not exist.');
 
     let cityName;
     if (user?.city_id) {
