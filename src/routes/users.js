@@ -85,50 +85,48 @@ router.get('/details/:user_id', verifyToken, async (req, res) => {
     const user = await User.findById(req.params.user_id).select('-password');
 
     let cityName;
-    City.findById(user.city_id, (err, city) => {
-      if (err) {
-        if (err.value === 'null') {
-          cityName = null;
-        }
-      } else {
-        cityName = city.name;
-      }
+    if (user?.city_id) {
+      const city = await City.findById({_id: user.city_id});
+      cityName = city?.name || null;
+    } else {
+      cityName = null;
+    }
 
-      const {
-        _id,
-        first_name,
-        last_name,
-        email,
-        address,
-        phone_number,
-        city_id,
-        fcm_tokens,
-        services,
-        created_at,
-        updated_at,
-      } = user;
-      res.status(200).json(
-        success(
-          'OK',
-          {
-            _id,
-            first_name,
-            last_name,
-            email,
-            address,
-            phone_number,
-            city_id,
-            fcm_tokens,
-            services,
-            created_at,
-            updated_at,
-            city_name: cityName,
-          },
-          res.statusCode,
-        ),
-      );
-    });
+    const {
+      _id,
+      first_name,
+      last_name,
+      email,
+      address,
+      phone_number,
+      city_id,
+      fcm_tokens,
+      services,
+      created_at,
+      updated_at,
+    } = user;
+    res.status(200).json(
+      success(
+        'OK',
+        {
+          _id,
+          first_name,
+          last_name,
+          email,
+          address,
+          phone_number,
+          city_id,
+          fcm_tokens,
+          services,
+          created_at,
+          updated_at,
+          city_name: cityName || null,
+        },
+        res.statusCode,
+      ),
+    );
   } catch ({message}) {
+    console.log(`message`, message);
     message.startsWith('Cast to')
       ? res.status(404).json(error('User not found', res.statusCode))
       : res.status(500).json(error(message, res.statusCode));
