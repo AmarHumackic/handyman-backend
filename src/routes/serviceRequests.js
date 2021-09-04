@@ -75,7 +75,7 @@ router.post('/', verifyToken, async (req, res) => {
       title,
       description,
       start_date,
-      due_date,
+      due_date: due_date || null,
       service_id,
       creator_id,
     });

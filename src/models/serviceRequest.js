@@ -16,7 +16,7 @@ const ServiceRequestsSchema = mongoose.Schema({
   },
   due_date: {
     type: Date,
-    required: true,
+    required: false,
   },
   service_id: {
     type: String,
