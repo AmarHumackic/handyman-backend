@@ -183,24 +183,16 @@ router.delete('/:service_request_id', verifyToken, async (req, res) => {
     if (!serviceRequest) throw new Error('Service request does not exist.');
 
     const token = req.headers['x-access-token'];
-    jwt.verify(token, SECRET, async (err, decoded) => {
-      if (err)
-        return res.status(500).send({error: 'Failed to authenticate token.'});
+    const decoded = jwt.verify(token, SECRET);
+    if (serviceRequest.creator_id !== decoded.id) {
+      throw new Error('Service request can be deleted only by a creator');
+    }
 
-      // if everything good, save to request for use in other routes
-
-      if (serviceRequest.creator_id !== decoded.id) {
-        throw new Error('Service request can be deleted only by a creator');
-      }
-
-      const deletedServiceRequest = await ServiceRequest.remove({
-        _id: req.params.service_request_id,
-      });
-
-      res
-        .status(200)
-        .json(success('OK', deletedServiceRequest, res.statusCode));
+    const deletedServiceRequest = await ServiceRequest.remove({
+      _id: req.params.service_request_id,
     });
+
+    res.status(200).json(success('OK', deletedServiceRequest, res.statusCode));
   } catch ({message}) {
     res.status(500).json(error(message, res.statusCode));
   }
