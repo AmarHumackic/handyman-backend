@@ -184,7 +184,12 @@ router.delete('/:service_request_id', verifyToken, async (req, res) => {
 
     const token = req.headers['x-access-token'];
     const decoded = jwt.verify(token, SECRET);
-    if (serviceRequest.creator_id !== decoded.id) {
+
+    const SUPER_ADMIN_ID = '6091a4002b322d00049f7aea'; // can delete requests by anyone
+    if (
+      serviceRequest.creator_id !== decoded.id &&
+      decoded.id !== SUPER_ADMIN_ID
+    ) {
       throw new Error('Service request can be deleted only by a creator');
     }
 
