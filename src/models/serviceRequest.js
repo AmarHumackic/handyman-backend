@@ -51,6 +51,11 @@ const ServiceRequestsSchema = mongoose.Schema({
     required: false,
     default: null,
   },
+  price: {
+    type: Number,
+    required: false,
+    default: null,
+  },
 });
 
 ServiceRequestsSchema.plugin(mongoosePaginate);

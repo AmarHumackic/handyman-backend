@@ -62,8 +62,15 @@ router.get('/:user_id', async (req, res) => {
 
 // add service request
 router.post('/', verifyToken, async (req, res) => {
-  const {title, description, start_date, due_date, service_id, creator_id} =
-    req.body;
+  const {
+    title,
+    description,
+    start_date,
+    due_date,
+    service_id,
+    creator_id,
+    price,
+  } = req.body;
   try {
     const serviceExist = await Service.exists({_id: service_id});
     if (!serviceExist) throw new Error('Service does not exist.');
@@ -78,6 +85,7 @@ router.post('/', verifyToken, async (req, res) => {
       due_date: due_date || null,
       service_id,
       creator_id,
+      price: price || null,
     });
     const newServiceRequest = await serviceRequest.save();
     res.status(200).json(success('OK', newServiceRequest, res.statusCode));
