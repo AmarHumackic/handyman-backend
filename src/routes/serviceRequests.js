@@ -14,7 +14,7 @@ const formatFileName = require('../utils/formatFileName');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './storage/');
+    cb(null, __dirname + '/../../public/');
   },
   filename: (req, file, cb) => {
     // cb(null, new Date().toISOString() + file.originalname); // can be any of the names, e.g new Date().toISOString() + file.originalname;
