@@ -10,6 +10,7 @@ var jwt = require('jsonwebtoken');
 const {SECRET} = process.env;
 const multer = require('multer');
 const formatFileName = require('../utils/formatFileName');
+const isDev = require('../utils/isDev');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -109,6 +110,17 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
     const userExist = await User.exists({_id: creator_id});
     if (!userExist) throw new Error('User does not exist.');
 
+    let imagePath;
+    if (req?.file?.path) {
+      if (isDev()) {
+        const startSliceIndex = req.file.path.indexOf('/uploads/');
+        imagePath = req.file.path.slice(startSliceIndex);
+      } else {
+        imagePath = req.file.path.slice(4);
+      }
+    } else {
+      imagePath = null;
+    }
     const serviceRequest = new ServiceRequest({
       title,
       description,
@@ -117,7 +129,7 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
       service_id,
       creator_id,
       price: price || null,
-      image: req?.file?.path || null,
+      image: imagePath,
     });
     const newServiceRequest = await serviceRequest.save();
     res.status(200).json(success('OK', newServiceRequest, res.statusCode));
