@@ -8,6 +8,37 @@ const {success, error} = require('../utils/responseApi');
 const getPagination = require('../utils/pagination');
 var jwt = require('jsonwebtoken');
 const {SECRET} = process.env;
+const multer = require('multer');
+const city = require('../models/city');
+const formatFileName = require('../utils/formatFileName');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'storage/');
+  },
+  filename: (req, file, cb) => {
+    // cb(null, new Date().toISOString() + file.originalname); // can be any of the names, e.g new Date().toISOString() + file.originalname;
+    cb(null, formatFileName(file.originalname));
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (file?.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    // throw an error if needed
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 2000000, // 2 MB
+  },
+  fileFilter,
+});
 
 // get all service requests
 router.get('/', async (req, res) => {
@@ -61,7 +92,7 @@ router.get('/:user_id', async (req, res) => {
 });
 
 // add service request
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   const {
     title,
     description,
@@ -70,6 +101,7 @@ router.post('/', verifyToken, async (req, res) => {
     service_id,
     creator_id,
     price,
+    image,
   } = req.body;
   try {
     const serviceExist = await Service.exists({_id: service_id});
@@ -86,6 +118,7 @@ router.post('/', verifyToken, async (req, res) => {
       service_id,
       creator_id,
       price: price || null,
+      image: req?.file?.path || null,
     });
     const newServiceRequest = await serviceRequest.save();
     res.status(200).json(success('OK', newServiceRequest, res.statusCode));
