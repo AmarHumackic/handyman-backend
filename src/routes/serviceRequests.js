@@ -11,10 +11,12 @@ const {SECRET} = process.env;
 const multer = require('multer');
 const city = require('../models/city');
 const formatFileName = require('../utils/formatFileName');
+const path = require('path');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __dirname + '/../../public/');
+    // cb(null, __dirname + '/../../public/');
+    cb(null, path.resolve(__dirname, 'build'));
   },
   filename: (req, file, cb) => {
     // cb(null, new Date().toISOString() + file.originalname); // can be any of the names, e.g new Date().toISOString() + file.originalname;
